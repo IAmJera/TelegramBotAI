@@ -1,0 +1,35 @@
+version: '3'
+services:
+  db:
+    container_name: mysql_bot
+    image: mysql:latest
+    restart: unless-stopped
+    env_file:
+      - ./config.env
+#    ports:         #for debug
+#      - '3306:3306'
+    environment:
+      MYSQL_DATABASE: bot
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    networks:
+      default:
+        ipv4_address: 172.20.1.2
+
+  bot:
+    container_name: bot
+    build: .
+    restart: unless-stopped
+    env_file:
+      - ./config.env
+    networks:
+      default:
+        ipv4_address: 172.20.1.3
+    environment:
+      MYSQL_ADDRESS: '172.20.1.2:3306'
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.1.0/24
