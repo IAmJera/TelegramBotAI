@@ -5,7 +5,7 @@ import (
 	functions2 "TelegramBotAI/app/functions"
 	"TelegramBotAI/app/general"
 	"TelegramBotAI/app/initial"
-	user2 "TelegramBotAI/app/user"
+	"TelegramBotAI/app/user"
 	"encoding/json"
 	"fmt"
 	tgbapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -24,14 +24,14 @@ func main() {
 			msg := tgbapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			msg.ReplyToMessageID = update.Message.MessageID
 
-			if user2.NotAllowed(base.MySQL, &msg) {
+			if user.NotAllowed(base.MySQL, &msg) {
 				if _, err := base.Bot.Send(msg); err != nil {
 					log.Printf("NotAllowed:Send: %s", err)
 				}
 				continue
 			}
 
-			base.User = user2.GetUser(base.MySQL, &msg)
+			base.User = user.GetUser(base.MySQL, &msg)
 			if update.Message.Voice != nil {
 				functions2.VoiceToText(&base, &update)
 			} else {
@@ -79,7 +79,7 @@ func menu(base *general.Base, msg *tgbapi.MessageConfig) {
 	}
 }
 
-func toggleGroupMode(u *user2.User, msg *tgbapi.MessageConfig) {
+func toggleGroupMode(u *user.User, msg *tgbapi.MessageConfig) {
 	u.ClearContext()
 	if u.GroupMode {
 		u.GroupMode = false
@@ -115,7 +115,7 @@ func getStatistic(base *general.Base, msg *tgbapi.MessageConfig) {
 	defer general.CloseFile(rows)
 
 	result := strings.Builder{}
-	var usr user2.User
+	var usr user.User
 	for rows.Next() {
 		var blobUser []byte
 		if err = rows.Scan(&blobUser); err != nil {
