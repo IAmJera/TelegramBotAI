@@ -1,9 +1,9 @@
-// Package initial defines init functions
+// Package initial defines the initialization of the program
 package initial
 
 import (
-	"TelegramBotAI/general"
-	"TelegramBotAI/user"
+	"TelegramBotAI/app/general"
+	"TelegramBotAI/app/user"
 	"context"
 	"database/sql"
 	"github.com/go-sql-driver/mysql"
@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-// InitBase initializes all services and returns a structure with them
+// InitBase initializes the base structure of the program
 func InitBase() general.Base {
 	var base general.Base
 	var err error

@@ -1,4 +1,4 @@
-// Package user defines the user methods and structure
+// Package user defines the structure and methods of the user
 package user
 
 import (
@@ -24,7 +24,7 @@ type Text struct {
 	Content string `json:"content"`
 }
 
-// IsNotAdmin check if the user is an admin
+// IsNotAdmin checks if the user is admin
 func (u *User) IsNotAdmin() bool {
 	admin, err := strconv.Atoi(os.Getenv("ADMIN_CHATID"))
 	if err != nil {
@@ -42,7 +42,7 @@ func (u *User) ClearContext() {
 	u.CTXLen = 0
 }
 
-// NotAllowed checks if the user has access to the bot
+// NotAllowed checks if the user is allowed to use the bot
 func NotAllowed(mysql *sql.DB, msg *tgbapi.MessageConfig) bool {
 	if _, err := GetUserFromDB(mysql, strconv.FormatInt(msg.ChatID, 10)); err == nil {
 		return false

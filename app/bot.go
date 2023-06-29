@@ -2,10 +2,10 @@
 package main
 
 import (
-	"TelegramBotAI/functions"
-	"TelegramBotAI/general"
-	"TelegramBotAI/initial"
-	"TelegramBotAI/user"
+	functions2 "TelegramBotAI/app/functions"
+	"TelegramBotAI/app/general"
+	"TelegramBotAI/app/initial"
+	user2 "TelegramBotAI/app/user"
 	"encoding/json"
 	"fmt"
 	tgbapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -24,16 +24,16 @@ func main() {
 			msg := tgbapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			msg.ReplyToMessageID = update.Message.MessageID
 
-			if user.NotAllowed(base.MySQL, &msg) {
+			if user2.NotAllowed(base.MySQL, &msg) {
 				if _, err := base.Bot.Send(msg); err != nil {
 					log.Printf("NotAllowed:Send: %s", err)
 				}
 				continue
 			}
 
-			base.User = user.GetUser(base.MySQL, &msg)
+			base.User = user2.GetUser(base.MySQL, &msg)
 			if update.Message.Voice != nil {
-				functions.VoiceToText(&base, &update)
+				functions2.VoiceToText(&base, &update)
 			} else {
 				menu(&base, &msg)
 			}
@@ -66,11 +66,11 @@ func menu(base *general.Base, msg *tgbapi.MessageConfig) {
 			msg.Text = "syntax: /photoGen [prompt]"
 			break
 		}
-		functions.SendPhoto(msg, base)
+		functions2.SendPhoto(base, msg)
 	case "/groupModeToggle":
 		toggleGroupMode(base.User, msg)
 	default:
-		functions.RequestGPT(msg, base)
+		functions2.RequestGPT(msg, base)
 	}
 	if msg.Text != "" {
 		if _, err := base.Bot.Send(msg); err != nil {
@@ -79,7 +79,7 @@ func menu(base *general.Base, msg *tgbapi.MessageConfig) {
 	}
 }
 
-func toggleGroupMode(u *user.User, msg *tgbapi.MessageConfig) {
+func toggleGroupMode(u *user2.User, msg *tgbapi.MessageConfig) {
 	u.ClearContext()
 	if u.GroupMode {
 		u.GroupMode = false
@@ -93,7 +93,7 @@ func toggleGroupMode(u *user.User, msg *tgbapi.MessageConfig) {
 func helpMessage(msg *tgbapi.MessageConfig) {
 	msg.Text = "/help - Display this message\n" +
 		"/spendTotal - Outputs how much money the user spent\n" +
-		"/context - Delete context manually. It usually lasts for " + strconv.Itoa(functions.GetCTXLen()) + " queries\n" +
+		"/context - Delete context manually. It usually lasts for " + strconv.Itoa(functions2.GetCTXLen()) + " queries\n" +
 		"/photoGen [prompt] - Generates an image based on a prompt\n" +
 		"/groupModToggle - Toggle group mode\n" +
 		"/userAdd [chatID] - Give the user access to the bot (Admin)\n" +
@@ -102,7 +102,6 @@ func helpMessage(msg *tgbapi.MessageConfig) {
 		"As long as you are in group mode, the bot will only respond if the request starts with \"bot,\""
 }
 
-// GetStatistic returns the list of users and their expenses for all time
 func getStatistic(base *general.Base, msg *tgbapi.MessageConfig) {
 	if base.User.IsNotAdmin() {
 		msg.Text = "you are not admin"
@@ -116,7 +115,7 @@ func getStatistic(base *general.Base, msg *tgbapi.MessageConfig) {
 	defer general.CloseFile(rows)
 
 	result := strings.Builder{}
-	var usr user.User
+	var usr user2.User
 	for rows.Next() {
 		var blobUser []byte
 		if err = rows.Scan(&blobUser); err != nil {

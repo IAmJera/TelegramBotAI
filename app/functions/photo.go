@@ -1,8 +1,8 @@
-// Package functions defines interaction functions with openai DALL*E
+// Package functions defines interaction functions with openai chatgpt-3.5, DALL*E and Whisper
 package functions
 
 import (
-	"TelegramBotAI/general"
+	"TelegramBotAI/app/general"
 	"bytes"
 	"encoding/json"
 	tgbapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -10,27 +10,27 @@ import (
 	"strings"
 )
 
-// RequestPhoto defines the structure of request to DALL*E api
+// RequestPhoto defines the structure of the request to DALL*E
 type RequestPhoto struct {
 	Prompt string `json:"prompt"`
 	Number int    `json:"n"`
 	Size   string `json:"size"`
 }
 
-// ResponsePhoto defines the structure of the array of links to the received photos
+// ResponsePhoto defines the structure of the response from DALL*E
 type ResponsePhoto struct {
 	Data []URLs `json:"data"`
 }
 
-// URLs defines the structure of link to received photos
+// URLs defines the structure of links to received photos
 type URLs struct {
 	URL string `json:"url"`
 }
 
 const photoAPIURL = "https://api.openai.com/v1/images/generations"
 
-// SendPhoto sends a prompt and receives an urls from the openai api
-func SendPhoto(msg *tgbapi.MessageConfig, base *general.Base) {
+// SendPhoto sends a request to DALL*E and sends the received photos to the user
+func SendPhoto(base *general.Base, msg *tgbapi.MessageConfig) {
 	response := general.GetResponse(bytes.NewBuffer(requestPhoto(msg)), photoAPIURL, "application/json")
 	defer general.CloseFile(response.Body)
 

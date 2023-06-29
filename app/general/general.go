@@ -2,7 +2,7 @@
 package general
 
 import (
-	"TelegramBotAI/user"
+	user2 "TelegramBotAI/app/user"
 	"bytes"
 	"database/sql"
 	"encoding/json"
@@ -15,19 +15,19 @@ import (
 	"strings"
 )
 
-// Base defines structure of general services
+// Base defines the base structure
 type Base struct {
 	MySQL *sql.DB
 	Bot   *tgbapi.BotAPI
-	User  *user.User
+	User  *user2.User
 }
 
-// Closer is interface required for the CloseFile method
+// Closer defines the interface for closing files
 type Closer interface {
 	Close() error
 }
 
-// CloseFile method call Close method of argument
+// CloseFile closes the file and logs the error if it exists
 func CloseFile(arg Closer) {
 	if err := arg.Close(); err != nil {
 		log.Println("CloseFile: ", err)
@@ -35,14 +35,14 @@ func CloseFile(arg Closer) {
 	return
 }
 
-// VerifyUser adds the user to the allowed user list and returns the execution status
+// VerifyUser checks if the user is admin and adds the user to the database
 func VerifyUser(base *Base, request string) string {
 	if base.User.IsNotAdmin() {
 		return "you are not admin"
 	}
 	id := strings.Split(request, " ")[1]
 
-	_, err := user.GetUserFromDB(base.MySQL, id)
+	_, err := user2.GetUserFromDB(base.MySQL, id)
 	if err != nil {
 		if err.Error() != "sql: no rows in result set" {
 			log.Printf("AddUser:GetUserFromDB: %s", err)
@@ -58,12 +58,12 @@ func VerifyUser(base *Base, request string) string {
 		return "chatID must be integer"
 	}
 
-	usr := user.User{ChatID: int64(chatid)}
+	usr := user2.User{ChatID: int64(chatid)}
 	usr.SetUser(base.MySQL)
 	return "User added successfully"
 }
 
-// ParseResponse reads and writes to the object the response from the server
+// ParseResponse parses the response and writes it to the variable
 func ParseResponse(response *http.Response, resp interface{}) {
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
@@ -74,7 +74,7 @@ func ParseResponse(response *http.Response, resp interface{}) {
 	}
 }
 
-// GetResponse sends a request to the server and returns a response
+// GetResponse gets the response from the server
 func GetResponse(req *bytes.Buffer, url string, content string) *http.Response {
 	request, err := http.NewRequest("POST", url, req)
 	if err != nil {

@@ -2,8 +2,8 @@
 package functions
 
 import (
-	"TelegramBotAI/general"
-	"TelegramBotAI/user"
+	"TelegramBotAI/app/general"
+	"TelegramBotAI/app/user"
 	"bytes"
 	"encoding/json"
 	tgbapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -15,7 +15,7 @@ import (
 
 const chatAPIURL = "https://api.openai.com/v1/chat/completions"
 
-// Request defines the structure of the request to the openai api
+// Request defines the request structure to api openai
 type Request struct {
 	Model   string      `json:"model"`
 	Message []user.Text `json:"messages"`
@@ -35,14 +35,14 @@ type Choice struct {
 	Index int       `json:"index"`
 }
 
-// Use defines the prompt info structure
+// Use defines the structure of the usage field from the openai api
 type Use struct {
 	Prompt     int `json:"prompt_tokens"`
 	Completion int `json:"completion_tokens"`
 	Total      int `json:"total_tokens"`
 }
 
-// GetCTXLen return max context length
+// GetCTXLen returns the max length of the context
 func GetCTXLen() int {
 	ctxLen, err := strconv.Atoi(os.Getenv("CONTEXT_LEN"))
 	if err != nil {

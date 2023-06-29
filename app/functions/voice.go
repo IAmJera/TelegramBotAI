@@ -1,8 +1,8 @@
-// Package functions defines interaction functions with openai Whisper
+// Package functions defines interaction functions with openai chatgpt-3.5, DALL*E and Whisper
 package functions
 
 import (
-	"TelegramBotAI/general"
+	"TelegramBotAI/app/general"
 	"bytes"
 	"encoding/json"
 	tgbapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"

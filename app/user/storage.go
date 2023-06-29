@@ -1,3 +1,4 @@
+// Package user defines the structure and methods of the user
 package user
 
 import (
@@ -8,7 +9,7 @@ import (
 	"strconv"
 )
 
-// SetUser writes the user into the database
+// SetUser adds a new user to the database
 func (u *User) SetUser(mysql *sql.DB) {
 	blobUser, err := json.Marshal(u)
 	if err != nil {
@@ -34,7 +35,7 @@ func (u *User) UpdateUser(mysql *sql.DB) {
 	}
 }
 
-// GetUser returns the structure of the user whose ID was sent
+// GetUser returns the user if it exists. Otherwise it returns an error
 func GetUser(mysql *sql.DB, msg *tgbapi.MessageConfig) *User {
 	var usr User
 	usr.ChatID = msg.ChatID
@@ -49,7 +50,7 @@ func GetUser(mysql *sql.DB, msg *tgbapi.MessageConfig) *User {
 	return &usr
 }
 
-// GetUserFromDB returns the user (byte format) if it exists. Otherwise it returns an error
+// GetUserFromDB returns the user (byte format) from the database
 func GetUserFromDB(mysql *sql.DB, id string) ([]byte, error) {
 	var blobUser []byte
 	query := "SELECT user FROM users WHERE id = ?"
